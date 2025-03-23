@@ -1,0 +1,182 @@
+body {
+    background-color: #f8f9fa;
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background-color: #4a7bff;
+    border-color: #4a7bff;
+}
+
+.btn-primary:hover {
+    background-color: #3a66e0;
+    border-color: #3a66e0;
+}
+
+.analysis-content {
+    min-height: 300px;
+}
+
+/* Tab styling */
+.nav-tabs .nav-link {
+    color: #666;
+    font-weight: 500;
+    border: none;
+    padding: 12px 20px;
+}
+
+.nav-tabs .nav-link.active {
+    color: #4a7bff;
+    border-bottom: 3px solid #4a7bff;
+    background: none;
+}
+
+.tab-content {
+    background-color: white;
+}
+
+/* Custom styling for markdown content */
+.analysis-content h1,
+.analysis-content h2,
+.analysis-content h3 {
+    color: #333;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.analysis-content h4,
+.analysis-content h5,
+.analysis-content h6 {
+    color: #555;
+    margin-top: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+.analysis-content ul,
+.analysis-content ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.analysis-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.analysis-content strong {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Recommendation styling */
+.recommendation-highlight {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.strong-buy {
+    background-color: #28a745;
+    color: white;
+}
+
+.buy {
+    background-color: #7cc47c;
+    color: white;
+}
+
+.hold {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.sell {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.strong-sell {
+    background-color: #dc3545;
+    color: white;
+}
+
+.confidence-score {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.target-price {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Chart styling */
+#priceSummary {
+    transition: all 0.3s ease;
+}
+
+#priceSummary:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+#currentPrice {
+    font-weight: 500;
+}
+
+#priceChange {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.period-btn {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.period-btn.active {
+    background-color: #4a7bff !important;
+    color: white !important;
+    border-color: #4a7bff !important;
+}
+
+#candlestickChart {
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.spinner-border {
+    animation: spinner-border 1.2s linear infinite, pulse 2s ease-in-out infinite;
+}

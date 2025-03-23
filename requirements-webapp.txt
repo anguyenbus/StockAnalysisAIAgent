@@ -1,0 +1,9 @@
+flask>=2.0.0
+markdown>=3.0.0
+# Use the same versions of langchain packages as installed for the main application
+# or use the latest versions without pinning to specific versions
+langchain==0.0.267
+langchain-core==0.0.13
+langgraph==0.0.9
+yfinance==0.2.18
+langchain-openai==0.0.2 
