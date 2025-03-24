@@ -75,4 +75,4 @@ This is a simplified web interface for the Stock Analysis AI tool that uses Olla
 - If you see an error about Ollama not being available, make sure the Ollama server is running
 - If the analysis takes too long, check your internet connection and Ollama server status
 - If the web interface doesn't load, ensure Flask is installed properly
-- If charts don't load, verify you have yfinance and pandas installed correctly 
+- If charts don't load, verify you have yfinance and pandas installed correctly

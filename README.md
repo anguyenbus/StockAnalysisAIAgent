@@ -95,7 +95,7 @@ The LLM (deepseek-r1:7b) processes each step and provides detailed analysis.
 
 - Python 3.8 or higher
 - Ollama installed (https://ollama.com)
-- Required Python packages: 
+- Required Python packages:
   - langchain
   - langchain-core
   - langgraph
@@ -130,4 +130,4 @@ The output provides a comprehensive analysis of the stock, including:
 - Technical analysis with trend analysis and key signals
 - Market analysis with sector performance and risk assessment
 - News analysis with sentiment and potential impact
-- Final recommendation with confidence score and target price range 
+- Final recommendation with confidence score and target price range

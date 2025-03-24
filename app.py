@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, jsonify
-import stock_analysis
 import traceback
+
 import markdown
+from flask import Flask, jsonify, render_template, request
+
+import stock_analysis
 
 app = Flask(__name__, static_url_path="/static")
 

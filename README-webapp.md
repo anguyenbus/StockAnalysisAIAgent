@@ -66,4 +66,4 @@ This is a web interface for the Stock Analysis AI tool that uses Ollama with the
 
 - If you see an error about Ollama not being available, make sure the Ollama server is running in a separate terminal
 - If the analysis takes too long, check your internet connection and Ollama server status
-- If the web interface doesn't load, ensure Flask is installed and the server is running 
+- If the web interface doesn't load, ensure Flask is installed and the server is running

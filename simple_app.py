@@ -1,13 +1,14 @@
-from flask import Flask, render_template, request, jsonify
-import subprocess
 import json
 import os
-import markdown
-import tempfile
 import re
-import yfinance as yf
-import pandas as pd
+import subprocess
+import tempfile
 from datetime import datetime, timedelta
+
+import markdown
+import pandas as pd
+import yfinance as yf
+from flask import Flask, jsonify, render_template, request
 
 
 # Custom JSON encoder to handle non-serializable objects

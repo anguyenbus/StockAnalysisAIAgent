@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 
-import sys
-import json
-import yfinance as yf
-import pandas as pd
-import numpy as np
 import argparse
+import json
+import sys
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Annotated
-from typing_extensions import TypedDict
+from typing import Annotated, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
+import yfinance as yf
+from langchain_core.messages import AIMessage, HumanMessage
 
 # Update imports to use recommended paths
 from langchain_core.prompts import PromptTemplate
-from langchain_core.messages import HumanMessage, AIMessage
-from langgraph.graph import Graph, StateGraph, START, END
-from langgraph.graph.message import add_messages
 from langchain_openai import ChatOpenAI
+from langgraph.graph import END, START, Graph, StateGraph
+from langgraph.graph.message import add_messages
+from typing_extensions import TypedDict
 
 
 # Define the State class to track our analysis state

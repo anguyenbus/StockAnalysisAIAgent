@@ -32,4 +32,4 @@ ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 USER $USERNAME
 
 # Set the default shell to bash
-ENV SHELL /bin/bash 
+ENV SHELL /bin/bash

@@ -22,4 +22,4 @@ fi
 # Start Flask app
 echo "Starting Stock Analysis AI Web App..."
 echo "Open your browser and navigate to: http://127.0.0.1:5000"
-python app.py 
+python app.py

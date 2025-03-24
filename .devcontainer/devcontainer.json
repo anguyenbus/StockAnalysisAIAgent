@@ -20,4 +20,4 @@
     "forwardPorts": [],
     "postCreateCommand": "poetry install && poetry run pre-commit install",
     "remoteUser": "vscode"
-} 
+}
