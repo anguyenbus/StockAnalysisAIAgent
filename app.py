@@ -1,4 +1,7 @@
+"""Simple Flask web application for stock analysis."""
+
 import traceback
+from typing import Any, Dict
 
 import markdown
 from flask import Flask, jsonify, render_template, request
@@ -9,12 +12,14 @@ app = Flask(__name__, static_url_path="/static")
 
 
 @app.route("/")
-def index():
+def index() -> str:
+    """Render the main page."""
     return render_template("index.html")
 
 
 @app.route("/analyze", methods=["POST"])
-def analyze():
+def analyze() -> Dict[str, Any]:
+    """Handle stock analysis requests."""
     try:
         symbol = request.form.get("symbol", "").strip().upper()
         if not symbol:
@@ -33,9 +38,9 @@ def analyze():
         }
 
         return jsonify({"success": True, "results": formatted_results})
-    except Exception as e:
+    except Exception as exc:
         print(traceback.format_exc())
-        return jsonify({"error": f"An error occurred: {str(e)}"})
+        return jsonify({"error": f"An error occurred: {str(exc)}"})
 
 
 if __name__ == "__main__":

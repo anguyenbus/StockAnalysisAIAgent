@@ -1,39 +1,46 @@
+"""Flask web application for stock analysis visualization."""
+
 import json
 import os
-import re
 import subprocess
 import tempfile
-from datetime import datetime, timedelta
+import traceback
+from typing import Any, Dict, Optional, Tuple
 
-import markdown
-import pandas as pd
 import yfinance as yf
 from flask import Flask, jsonify, render_template, request
 
 
-# Custom JSON encoder to handle non-serializable objects
+# Custom JSON encoder for handling non-serializable objects
 class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
+    """Custom JSON encoder for handling non-serializable objects."""
+
+    def default(self, obj: Any) -> Any:
+        """Convert non-serializable objects to strings."""
         try:
             return super().default(obj)
-        except TypeError:
-            # Convert non-serializable objects to strings
+        except (ValueError, TypeError, KeyError):
             return str(obj)
 
 
 app = Flask(__name__, static_url_path="/static")
-app.json_encoder = CustomJSONEncoder  # Use our custom encoder
+app.json_encoder = CustomJSONEncoder  # type: ignore
 
 
 @app.route("/")
-def index():
+def index() -> str:
+    """Render the main page."""
     return render_template("index.html")
 
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
+    """Handle stock analysis requests."""
     try:
         data = request.json
+        if data is None:  # Handle case when request.json is None
+            return jsonify({"success": False, "error": "Invalid JSON data"})
+
         symbol = data.get("symbol", "").strip().upper()
         if not symbol:
             return jsonify(
@@ -58,7 +65,7 @@ def analyze():
 
         # Read the results from the temporary file
         try:
-            with open(temp_path, "r") as f:
+            with open(temp_path, "r", encoding="utf-8") as f:
                 results = json.load(f)
         except json.JSONDecodeError:
             return jsonify(
@@ -81,9 +88,7 @@ def analyze():
             )
 
         return jsonify({"success": True, "data": results, "price_data": price_data})
-    except Exception as e:
-        import traceback
-
+    except (ValueError, TypeError, KeyError) as e:
         print(traceback.format_exc())
         return jsonify({"success": False, "error": f"An error occurred: {str(e)}"})
 
@@ -103,8 +108,18 @@ def get_price_data(symbol):
         return jsonify({"error": f"Failed to fetch price data: {str(e)}"})
 
 
-def fetch_price_data(symbol, period="6mo"):
-    """Fetch historical price data for the given symbol and time period"""
+def fetch_price_data(
+    symbol: str, period: str = "6mo"
+) -> Tuple[Optional[Dict], Optional[str]]:
+    """Fetch historical price data for the given symbol and time period.
+
+    Args:
+        symbol: Stock ticker symbol
+        period: Time period for data (default: "6mo")
+
+    Returns:
+        Tuple containing price data dictionary and error message (if any)
+    """
     try:
         # Valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
         ticker = yf.Ticker(symbol)
@@ -115,25 +130,25 @@ def fetch_price_data(symbol, period="6mo"):
 
         # Format data for candlestick chart
         chart_data = []
-        for index, row in hist.iterrows():
+        for idx, row in hist.iterrows():
             chart_data.append(
                 {
-                    "date": index.strftime("%Y-%m-%d"),
-                    "open": float(round(row["Open"], 2)),
-                    "high": float(round(row["High"], 2)),
-                    "low": float(round(row["Low"], 2)),
-                    "close": float(round(row["Close"], 2)),
+                    "date": idx.strftime("%Y-%m-%d"),  # type: ignore
+                    "open": float(row["Open"]),
+                    "high": float(row["High"]),
+                    "low": float(row["Low"]),
+                    "close": float(row["Close"]),
                     "volume": int(row["Volume"]),
                 }
             )
 
-        # Get current price and change - using iloc instead of negative indexing
-        current_price = float(round(hist["Close"].iloc[-1], 2))
+        # Get current price and change
+        current_price = float(hist["Close"].iloc[-1])
         previous_close = (
-            float(round(hist["Close"].iloc[-2], 2)) if len(hist) > 1 else current_price
+            float(hist["Close"].iloc[-2]) if len(hist) > 1 else current_price
         )
-        change_value = float(round(current_price - previous_close, 2))
-        change_percent = float(
+        change_value = round(current_price - previous_close, 2)
+        change_percent = (
             round((change_value / previous_close) * 100, 2) if previous_close > 0 else 0
         )
 
@@ -145,11 +160,27 @@ def fetch_price_data(symbol, period="6mo"):
         }
 
         return {"chart_data": chart_data, "price_summary": price_summary}, None
-    except Exception as e:
-        import traceback
-
+    except (ValueError, TypeError, KeyError) as e:
         print(traceback.format_exc())
         return None, f"Error fetching price data: {str(e)}"
+
+
+def run_command(command):
+    """Execute a shell command and return the results."""
+    try:
+        with subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
+            text=True,
+        ) as process:
+            _, stderr = process.communicate()
+            if process.returncode != 0:
+                return False, stderr
+            return True, None
+    except (subprocess.SubprocessError, OSError) as e:
+        return False, str(e)
 
 
 if __name__ == "__main__":

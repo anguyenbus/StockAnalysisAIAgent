@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
+# Add docstring at the module level
+"""Stock analysis module using LangChain and Ollama for AI-powered market insights."""
+
 import argparse
 import json
-import sys
-from datetime import datetime, timedelta
-from typing import Annotated, Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import Annotated, Any, Dict
 
-import numpy as np
 import pandas as pd
 import yfinance as yf
-from langchain_core.messages import AIMessage, HumanMessage
-
-# Update imports to use recommended paths
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, Graph, StateGraph
@@ -21,17 +19,21 @@ from typing_extensions import TypedDict
 
 # Define the State class to track our analysis state
 class State(TypedDict):
-    # Messages have the type "list". The `add_messages` function
-    # in the annotation defines how this state key should be updated
-    # (in this case, it appends messages to the list, rather than overwriting them)
+    """State class to track analysis state and results."""
+
     messages: Annotated[list, add_messages]
     symbol: str
     llm: ChatOpenAI
-    results: Dict
+    results: Dict[str, Any]
 
 
 # Initialize the ollama endpoint
-def setup_llm():
+def setup_llm() -> ChatOpenAI:
+    """Initialize and configure the Ollama LLM endpoint.
+
+    Returns:
+        ChatOpenAI: Configured LLM instance
+    """
     return ChatOpenAI(
         model="deepseek-r1:7b",
         api_key="ollama",
@@ -43,7 +45,14 @@ def setup_llm():
 
 # Technical Analysis Node
 def technical_analysis(state: State) -> State:
-    """Node for technical analysis"""
+    """Perform technical analysis on the stock.
+
+    Args:
+        state: Current analysis state
+
+    Returns:
+        State: Updated state with technical analysis results
+    """
     symbol = state["symbol"]
     llm = state["llm"]
 
@@ -83,10 +92,7 @@ def technical_analysis(state: State) -> State:
     analysis = chain.invoke({"symbol": symbol, "data": json.dumps(data, indent=2)})
 
     # Extract the content from AIMessage if needed
-    if hasattr(analysis, "content"):
-        analysis_text = analysis.content
-    else:
-        analysis_text = str(analysis)
+    analysis_text = analysis.content if hasattr(analysis, "content") else str(analysis)
 
     state["results"]["technical"] = {"data": data, "analysis": analysis_text}
     return state
@@ -94,7 +100,14 @@ def technical_analysis(state: State) -> State:
 
 # Market Analysis Node
 def market_analysis(state: State) -> State:
-    """Node for market analysis"""
+    """Perform market analysis on the stock.
+
+    Args:
+        state: Current analysis state
+
+    Returns:
+        State: Updated state with market analysis results
+    """
     symbol = state["symbol"]
     llm = state["llm"]
 
@@ -128,10 +141,7 @@ def market_analysis(state: State) -> State:
     analysis = chain.invoke({"symbol": symbol, "data": json.dumps(data, indent=2)})
 
     # Extract the content from AIMessage if needed
-    if hasattr(analysis, "content"):
-        analysis_text = analysis.content
-    else:
-        analysis_text = str(analysis)
+    analysis_text = analysis.content if hasattr(analysis, "content") else str(analysis)
 
     state["results"]["market"] = {"data": data, "analysis": analysis_text}
     return state
@@ -139,7 +149,14 @@ def market_analysis(state: State) -> State:
 
 # News Analysis Node
 def news_analysis(state: State) -> State:
-    """Node for news analysis"""
+    """Perform news analysis on the stock.
+
+    Args:
+        state: Current analysis state
+
+    Returns:
+        State: Updated state with news analysis results
+    """
     symbol = state["symbol"]
     llm = state["llm"]
 
@@ -176,10 +193,7 @@ def news_analysis(state: State) -> State:
     analysis = chain.invoke({"symbol": symbol, "news": json.dumps(news_data, indent=2)})
 
     # Extract the content from AIMessage if needed
-    if hasattr(analysis, "content"):
-        analysis_text = analysis.content
-    else:
-        analysis_text = str(analysis)
+    analysis_text = analysis.content if hasattr(analysis, "content") else str(analysis)
 
     state["results"]["news"] = {"data": news_data, "analysis": analysis_text}
     return state
@@ -187,7 +201,14 @@ def news_analysis(state: State) -> State:
 
 # Final Recommendation Node
 def generate_recommendation(state: State) -> State:
-    """Node for final recommendation"""
+    """Generate final investment recommendation.
+
+    Args:
+        state: Current analysis state
+
+    Returns:
+        State: Updated state with final recommendation
+    """
     symbol = state["symbol"]
     llm = state["llm"]
     results = state["results"]
@@ -226,26 +247,39 @@ def generate_recommendation(state: State) -> State:
     )
 
     # Extract the content from AIMessage if needed
-    if hasattr(recommendation, "content"):
-        recommendation_text = recommendation.content
-    else:
-        recommendation_text = str(recommendation)
+    recommendation_text = (
+        recommendation.content
+        if hasattr(recommendation, "content")
+        else str(recommendation)
+    )
 
     state["results"]["recommendation"] = recommendation_text
     return state
 
 
 def calculate_rsi(prices: pd.Series, period: int = 14) -> pd.Series:
-    """Calculate RSI indicator"""
+    """Calculate the Relative Strength Index (RSI) indicator.
+
+    Args:
+        prices: Series of price data
+        period: RSI calculation period (default: 14)
+
+    Returns:
+        pd.Series: Calculated RSI values
+    """
     delta = prices.diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-    rs = gain / loss
-    return 100 - (100 / (1 + rs))
+    rs_value = gain / loss
+    return 100 - (100 / (1 + rs_value))
 
 
 def create_analysis_graph() -> Graph:
-    """Create the analysis workflow graph"""
+    """Create the analysis workflow graph.
+
+    Returns:
+        Graph: Compiled workflow graph
+    """
     # Create workflow graph
     workflow = StateGraph(State)
 
@@ -268,12 +302,22 @@ def create_analysis_graph() -> Graph:
 
 
 class StockAdvisor:
+    """Main class for performing stock analysis."""
+
     def __init__(self):
+        """Initialize StockAdvisor with LLM and analysis graph."""
         self.llm = setup_llm()
         self.graph = create_analysis_graph()
 
-    def analyze_stock(self, symbol: str) -> Dict:
-        """Run complete stock analysis"""
+    def analyze_stock(self, symbol: str) -> Dict[str, Any]:
+        """Run complete stock analysis for given symbol.
+
+        Args:
+            symbol: Stock ticker symbol
+
+        Returns:
+            Dict[str, Any]: Analysis results
+        """
         print(f"\nAnalyzing {symbol}...")
 
         # Initialize state
@@ -285,8 +329,15 @@ class StockAdvisor:
 
 
 # Helper function to run analysis
-def run_analysis(symbol: str):
-    """Run stock analysis and print results"""
+def run_analysis(symbol: str) -> Dict[str, Any]:
+    """Run stock analysis and format results.
+
+    Args:
+        symbol: Stock ticker symbol
+
+    Returns:
+        Dict[str, Any]: Formatted analysis results
+    """
     advisor = StockAdvisor()
     results = advisor.analyze_stock(symbol)
 
@@ -316,7 +367,8 @@ def run_analysis(symbol: str):
     return formatted_results
 
 
-def main():
+def main() -> None:
+    """Main function to run the stock analysis tool."""
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Stock Analysis Tool")
     parser.add_argument(
@@ -330,16 +382,19 @@ def main():
 
     # Save results to JSON file if output path is provided
     if args.output:
-        with open(args.output, "w") as f:
+        with open(args.output, "w", encoding="utf-8") as file:
             # Use a custom encoder to ensure all objects are serializable
             class CustomEncoder(json.JSONEncoder):
-                def default(self, obj):
-                    try:
-                        return super().default(obj)
-                    except TypeError:
-                        return str(obj)
+                """Custom JSON encoder for handling non-serializable objects."""
 
-            json.dump(results, f, cls=CustomEncoder)
+                def default(self, o):
+                    """Convert non-serializable objects to strings."""
+                    try:
+                        return super().default(o)
+                    except TypeError:
+                        return str(o)
+
+            json.dump(results, file, cls=CustomEncoder)
         print(f"\nResults saved to {args.output}")
     else:
         # Print results to stdout as JSON
